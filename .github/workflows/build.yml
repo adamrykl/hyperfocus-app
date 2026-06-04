@@ -38,3 +38,12 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: "--target x86_64-pc-windows-msvc"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hyperfocus-windows-build
+          path: |
+            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
