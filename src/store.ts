@@ -78,6 +78,7 @@ export interface HyperfocusStore {
   toggleTodo: (id: string) => void;
   deleteTodo: (id: string) => void;
   toggleCollapse: (id: string) => void;
+  editTodo: (id: string, newText: string) => void;
 }
 
 // ============================================
@@ -131,7 +132,7 @@ const INITIAL_TODOS: TodoItemType[] = [
   },
   {
     id: "demo-4",
-    text: "Check me off when done",
+    text: "Click any task text to edit it",
     completed: false,
     collapsed: false,
     children: [],
@@ -238,6 +239,21 @@ function deleteTodoRecursive(items: TodoItemType[], id: string): TodoItemType[] 
       ...item,
       children: deleteTodoRecursive(item.children, id),
     }));
+}
+
+/**
+ * Recursively edits a todo item's text by its id.
+ */
+function editTodoRecursive(items: TodoItemType[], id: string, newText: string): TodoItemType[] {
+  return items.map((item) => {
+    if (item.id === id) {
+      return { ...item, text: newText.trim() };
+    }
+    if (item.children.length > 0) {
+      return { ...item, children: editTodoRecursive(item.children, id, newText) };
+    }
+    return item;
+  });
 }
 
 /**
@@ -430,6 +446,12 @@ export const useHyperfocusStore = create<HyperfocusStore>()(
     toggleCollapse: (id: string) => {
       set((state) => ({
         todos: toggleCollapseRecursive(state.todos, id),
+      }));
+    },
+
+    editTodo: (id: string, newText: string) => {
+      set((state) => ({
+        todos: editTodoRecursive(state.todos, id, newText),
       }));
     },
   }))
